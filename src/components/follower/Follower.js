@@ -9,6 +9,7 @@ function Follower({ user }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const feedData = useSelector((state) => state.feedDataReducer.feedData);
+
   const [isFollowing, setIsFollowing] = useState();
 
   useEffect(() => {

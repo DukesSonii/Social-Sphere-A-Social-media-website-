@@ -5,26 +5,19 @@ import "./Feed.scss";
 import { useSelector, useDispatch } from "react-redux";
 import { getFeedData } from "../../redux/slices/feedSlice";
 import { FaComments, FaTimes } from "react-icons/fa";
+import Avatar from "../avatar/Avatar";
+import { UpOutlined } from "@ant-design/icons";
 
 function Feed() {
   const dispatch = useDispatch();
   const feedData = useSelector((state) => state.feedDataReducer.feedData);
+  console.log(feedData);
+
+  const myProfile = useSelector((state) => state.appConfigReducer.myProfile);
+
   const [showMessages, setShowMessages] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [messages, setMessages] = useState({
-    "Duke Soni": [
-      { from: "You", text: "Hey, how's it going?" },
-      { from: "Duke Soni", text: "I'm good, thanks! How about you?" },
-    ],
-    "John Doe": [
-      { from: "John Doe", text: "Have you seen the latest movie?" },
-      { from: "You", text: "Not yet! Is it good?" },
-    ],
-    "Jane Smith": [
-      { from: "You", text: "Do you want to grab lunch tomorrow?" },
-      { from: "Jane Smith", text: "Sure! What time?" },
-    ],
-  });
+  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
@@ -39,7 +32,6 @@ function Feed() {
   const handleUserClick = (user) => {
     setSelectedUser(user);
     setShowMessages(false);
-    // Reset message input for new conversation
     setNewMessage("");
   };
 
@@ -67,7 +59,7 @@ function Feed() {
       <div className="container">
         <div className="left-part">
           {/*feed data upar se data mil jayaga, toh iske data mai jayanga */}
-          {/*saare posts ko render kr dena  */}
+          {/*saare posts ko render kr dena  */}{" "}
           {feedData?.posts?.map((post) => (
             <Post key={post._id} post={post} />
           ))}
@@ -98,30 +90,39 @@ function Feed() {
         </div>
       </div>
 
+      {/* Messages Bar */}
       <div className="messages-bar" onClick={handleToggleMessages}>
-        <FaComments className="messages-icon" />
-        <span className="messages-text">Chat</span>
+        <div className="avatar-container">
+          <Avatar src={myProfile?.avatar?.url} />
+        </div>
+        <div className="messages-icon">🗨️</div>
+        <div className="messages-text">
+          Messages <UpOutlined />{" "}
+        </div>
       </div>
 
+      {/* Messages Dropdown */}
       {showMessages && (
         <div className="messages-dropdown">
           <button className="close-button" onClick={handleToggleMessages}>
             <FaTimes />
           </button>
           <div className="message-users">
-            {Object.keys(messages).map((user) => (
+            {feedData?.followings?.map((user) => (
               <div
-                key={user}
+                key={user?.id}
                 className="message-user"
-                onClick={() => handleUserClick(user)}
+                onClick={() => handleUserClick(user?.name)} // Set 'name' as the selected user
               >
-                {user}
+                <img src={user?.avatar?.url} alt={user?.name} />
+                {user?.name}
               </div>
             ))}
           </div>
         </div>
       )}
 
+      {/* Modal for Chat */}
       {selectedUser && (
         <div className="message-modal">
           <div className="modal-header">
